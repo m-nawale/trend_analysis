@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 from gensim.corpora import Dictionary
 from gensim.models.ldamodel import LdaModel
-import os
+
 
 def load_preprocessed_data():
     """Load the preprocessed dataset."""
@@ -12,10 +13,11 @@ def load_preprocessed_data():
     # Check if the file exists
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"The preprocessed data file was not found at {data_path}. Please run preprocessing first.")
-    
+
     # Load the dataset
     df = pd.read_excel(data_path)
     return df['Processed_Title'] + " " + df['Processed_Abstract']
+
 
 def prepare_corpus(texts):
     """Prepare dictionary and corpus for LDA model."""
@@ -33,7 +35,8 @@ def prepare_corpus(texts):
 
     return dictionary, corpus
 
-def build_lda_model(corpus, dictionary, num_topics=5):
+
+def build_lda_model(corpus, dictionary, num_topics=10):
     """Build and train the LDA model."""
     lda_model = LdaModel(
         corpus=corpus,
@@ -46,11 +49,15 @@ def build_lda_model(corpus, dictionary, num_topics=5):
     )
     return lda_model
 
-def display_topics(lda_model, num_words=10):
-    """Display the topics and their associated keywords."""
-    topics = lda_model.print_topics(num_words=num_words)
-    for idx, topic in topics:
-        print(f"Topic {idx}: {topic}")
+
+def summarize_topics(lda_model, num_words=5):
+    """Generate summaries for each topic based on the top keywords."""
+    topic_summaries = {}
+    for idx, topic in lda_model.show_topics(formatted=False, num_words=num_words):
+        keywords = [word for word, _ in topic]
+        topic_summaries[f"Topic {idx}"] = " / ".join(keywords)
+    return topic_summaries
+
 
 def main():
     # Dynamically resolve the base directory
@@ -69,9 +76,12 @@ def main():
     print("Building the LDA model...")
     lda_model = build_lda_model(corpus, dictionary)
 
-    # Display the topics
-    print("\nTopics Identified:")
-    display_topics(lda_model)
+    # Generate topic summaries
+    print("\nSummarizing Topics...")
+    topic_summaries = summarize_topics(lda_model)
+
+    for topic, summary in topic_summaries.items():
+        print(f"{topic}: {summary}")
 
     # Save the model and dictionary
     model_path = os.path.join(output_dir, 'lda_model')
