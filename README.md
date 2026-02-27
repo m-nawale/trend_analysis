@@ -99,6 +99,5 @@ This project performs topic modeling on research papers to analyze trends in mac
 ## Contact
     For questions or feedback, reach out at:
 
-    Email: manoj.nawale.work@example.com
-    GitLab Profile: mnawale
-    GitHub Profile: m-nawale
+    Email: manoj.nawale@outlook.com
+    GitHub Profile: manoj-nawale
